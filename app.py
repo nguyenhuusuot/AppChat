@@ -1,3 +1,7 @@
+from gevent import monkey
+monkey.patch_all()
+
+
 import os                       # <--- THÊM DÒNG NÀY
 from dotenv import load_dotenv
 
@@ -19,8 +23,6 @@ print(f"[DEBUG] Database URI đang dùng: {app.config['SQLALCHEMY_DATABASE_URI']
 print("======================================================")
 
 
-
-
 if __name__ == '__main__':
     print(f"Starting server in  '{config_name}' mode..." )
-    socketio.run(app, debug=app.config['DEBUG'])
+    socketio.run(app, host='0.0.0.0', port=5000, debug=app.config['DEBUG'])

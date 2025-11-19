@@ -51,3 +51,15 @@ def login_user(data):
     access_token = create_access_token(identity=str(user.id)) 
 
     return {"access_token":access_token},200
+
+def get_me(user_id):
+    """
+    Service lấy thông tin người dùng hiện tại qua ID
+    """
+    user = User.query.get(user_id)
+    
+    if not user:
+        return {"message": "Không tìm thấy người dùng"}, 404
+    
+    # Trả về thông tin user (đã ẩn password nhờ schema)
+    return user_schema.dump(user), 200

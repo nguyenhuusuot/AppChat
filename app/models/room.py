@@ -5,8 +5,12 @@ class Room(db.Model):
     __tablename__ = 'room'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=True) 
+    name = db.Column(db.String(100), nullable=True) 
+    avatar = db.Column(db.String(200), nullable=True)
+    admin_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     is_private = db.Column(db.Boolean, default=True) 
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)   
+    
     # Quan hệ với tin nhắn: Một Room có nhiều Message
     messages = db.relationship(
         'Message', 
@@ -21,6 +25,7 @@ class Room(db.Model):
         back_populates='room', 
         cascade="all, delete-orphan"
     )
+    admin = db.relationship('User', foreign_keys=[admin_id])
     
     def __repr__(self):
         return f'<Room {self.id} (Private: {self.is_private})>'

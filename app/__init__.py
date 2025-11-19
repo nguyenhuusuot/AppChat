@@ -1,10 +1,12 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
 from flask_jwt_extended import JWTManager
 from flask_marshmallow import Marshmallow
 from .core.config import config_by_name
+from flask_cors import CORS
+from app.core import config
 
 # Khởi tạo extensions
 db = SQLAlchemy()
@@ -13,7 +15,7 @@ jwt = JWTManager()
 ma = Marshmallow()
 
 # Khởi tạo socketio
-socketio = SocketIO(async_mode='eventlet', cors_allowed_origins="*")
+socketio = SocketIO(async_mode='gevent', cors_allowed_origins="*")
 
 def create_app(config_name = 'dev'):
     # Hàm tạo application 
@@ -22,11 +24,22 @@ def create_app(config_name = 'dev'):
     # Tải cấu hình
     app.config.from_object(config_by_name[config_name])
     # Tạo extensions với app
+    CORS(app, resources={
+        r"/api/*":{ # Áp dụng cho các route bắt đầu bằng api
+            "origins":config.ALLOWED_ORIGINS,
+            "supports_credentials":True
+        }
+    })
     db.init_app(app)
     migrate.init_app(app,db)
     jwt.init_app(app)
     ma.init_app(app)
-    socketio.init_app(app, message_queue=app.config['REDIS_URL'])
+    if app.debug:
+        print("Running in DEBUG mode: SocketIO will use local memory (No Redis)")
+        socketio.init_app(app, cors_allowed_origins="*")
+    else:
+        print("Running in PRODUCTION mode: SocketIO using Redis Message Queue")
+        socketio.init_app(app, message_queue=app.config['REDIS_URL'], cors_allowed_origins="*")
 
     from .models import user, room, message, participant
     
@@ -47,5 +60,8 @@ def create_app(config_name = 'dev'):
     @app.route('/health')
     def health_check():
         return "App is running"
-    
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+
     return app

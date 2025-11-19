@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from app.schemas.user import user_schema
 from marshmallow import ValidationError
 from . import service 
@@ -38,5 +39,21 @@ def login():
     
     # Gọi service login
     response_data, status_code = service.login_user(data)
+    
+    return jsonify(response_data), status_code
+
+@auth_bp.route('/me', methods=['GET'])
+@jwt_required() # <--- Bắt buộc phải có Token hợp lệ mới được vào
+def me():
+    """
+    API Lấy thông tin người dùng hiện tại (Who am I?)
+    URL: GET /api/auth/me
+    Header: Authorization: Bearer <token>
+    """
+    # 1. Lấy ID user từ trong Token (đã được giải mã)
+    current_user_id = get_jwt_identity()
+    
+    # 2. Gọi Service để lấy thông tin chi tiết từ Database
+    response_data, status_code = service.get_me(current_user_id)
     
     return jsonify(response_data), status_code

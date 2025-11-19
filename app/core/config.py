@@ -4,7 +4,16 @@ from dotenv import load_dotenv
 basedir = os.path.abspath(os.path.dirname(__file__))
 # tải biến môi trường
 load_dotenv(os.path.join(basedir,'.env'))
-
+ALLOWED_ORIGINS = [
+        # Dùng khi chạy frontend ở local (ví dụ: React, Vue)
+        "http://localhost:3000",
+        "http://localhost:5000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5500", # (Nếu dùng VS Code Live Server)    
+        # Dùng cho khi triển khai (Domain thật)
+        "https://your-frontend-website.com",
+        "null"
+    ]
 class Config:
     # Cấu hình cơ sở
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'key_bao_mat_2'

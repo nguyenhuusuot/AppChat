@@ -18,7 +18,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    
+    avatar = db.Column(db.String(200), default=None)
     # Quan hệ với tin nhắn: Một User có thể gửi nhiều Message
     messages_sent = db.relationship('Message', 
                                     back_populates='sender', 
