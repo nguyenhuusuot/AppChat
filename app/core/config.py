@@ -50,4 +50,4 @@ config_by_name={
 
 def get_config_name():
     # Mặc định là dev
-    return os.environ.get('FLASK_ENV','dev') 
+    return os.environ.get('FLASK_ENV','prod') 
