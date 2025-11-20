@@ -1,5 +1,5 @@
+from datetime import datetime, timezone
 from app import db
-import datetime
 
 class Room(db.Model):
     __tablename__ = 'room'
@@ -9,7 +9,7 @@ class Room(db.Model):
     avatar = db.Column(db.String(200), nullable=True)
     admin_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     is_private = db.Column(db.Boolean, default=True) 
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)   
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))  
     
     # Quan hệ với tin nhắn: Một Room có nhiều Message
     messages = db.relationship(

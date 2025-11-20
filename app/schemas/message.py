@@ -7,7 +7,6 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 
 # Khai báo ParticipantSchema TRƯỚC (Vì RoomSchema cần dùng nó)
-
 class ParticipantSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Participant
@@ -16,8 +15,6 @@ class ParticipantSchema(SQLAlchemyAutoSchema):
 
     # Lồng thông tin User (để biết ai là ai trong phòng)
     user = fields.Nested(UserSchema(only=("id", "username", "email")))
-
-
 
 # Khai báo MessageSchema (Cũng nên khai báo trước Room)
 class MessageSchema(SQLAlchemyAutoSchema):
@@ -30,7 +27,6 @@ class MessageSchema(SQLAlchemyAutoSchema):
     sender = fields.Nested(UserSchema(only=("id", "username", "avatar"))) 
 
 # Khai báo RoomSchema SAU CÙNG
-
 class RoomSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Room

@@ -4,11 +4,9 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 
 class UserSchema(SQLAlchemyAutoSchema):
-    """
-    Schema này dùng để:
-    (Load) Xác thực dữ liệu đăng ký (username, email, password).
-    (Dump) Trả về thông tin user (ẩn password_hash).
-    """
+    # (Load) Xác thực dữ liệu đăng ký (username, email, password).
+    # (Dump) Trả về thông tin user (ẩn password_hash).
+    
     class Meta:
         model = User        
         load_instance = False  
@@ -25,7 +23,9 @@ class UserSchema(SQLAlchemyAutoSchema):
     # Thêm trường 'password' (không có trong DB)
     # Chỉ nhận vào (load_only), không bao giờ gửi ra
     password = fields.Str(required=True, load_only=True)
-
+    display_name = fields.Str(dump_only=True) # Chỉ gửi xuống client
+    # Trường ảo avatar url (để tiện hiển thị)
+    avatar = fields.Str(dump_only=True)
 # Khởi tạo các schema để dùng trong API
 user_schema = UserSchema() 
 users_schema = UserSchema(many=True) 

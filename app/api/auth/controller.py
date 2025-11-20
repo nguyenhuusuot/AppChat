@@ -15,13 +15,13 @@ def register():
         return jsonify({"message": "No input data provided"}), 400
 
     try:
-        # Load data (với load_instance=False)
+        # Load data
         data = user_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 400
     
     # Gọi service, nó sẽ trả về (data, status_code)
-    response_data, status_code = service.register_user(data) # Gọi hàm service
+    response_data, status_code = service.register_user(data)
     
     return jsonify(response_data), status_code
 
@@ -43,17 +43,14 @@ def login():
     return jsonify(response_data), status_code
 
 @auth_bp.route('/me', methods=['GET'])
-@jwt_required() # <--- Bắt buộc phải có Token hợp lệ mới được vào
+@jwt_required() # Bắt buộc phải có Token hợp lệ mới được vào
 def me():
-    """
-    API Lấy thông tin người dùng hiện tại (Who am I?)
-    URL: GET /api/auth/me
-    Header: Authorization: Bearer <token>
-    """
-    # 1. Lấy ID user từ trong Token (đã được giải mã)
+    # API Lấy thông tin người dùng hiện tại
+    
+    # Lấy ID user từ trong Token (đã được giải mã)
     current_user_id = get_jwt_identity()
     
-    # 2. Gọi Service để lấy thông tin chi tiết từ Database
+    # Gọi Service để lấy thông tin chi tiết từ Database
     response_data, status_code = service.get_me(current_user_id)
     
     return jsonify(response_data), status_code

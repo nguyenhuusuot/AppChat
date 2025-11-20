@@ -1,13 +1,13 @@
+from datetime import datetime, timezone
 from app import db 
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
 
 # Bảng trung gian cho quan hệ bạn bè (nhiều-nhiều)
 friendship = db.Table('friendship',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('friend_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
     db.Column('status', db.Enum('pending', 'accepted', name='friendship_status'), default='pending'),
-    db.Column('created_at', db.DateTime, default=datetime.datetime.utcnow)
+    db.Column('created_at', db.DateTime, default=lambda: datetime.now(timezone.utc))
 )
 
 class User(db.Model):
@@ -16,8 +16,9 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    display_name = db.Column(db.String(100), nullable=True) 
     password_hash = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     avatar = db.Column(db.String(200), default=None)
     # Quan hệ với tin nhắn: Một User có thể gửi nhiều Message
     messages_sent = db.relationship('Message', 

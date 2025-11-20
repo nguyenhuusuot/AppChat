@@ -39,19 +39,16 @@ def get_history(room_id):
 @chat_bp.route('/upload', methods=['POST'])
 @jwt_required()
 def upload_chat_image():
-    """
-    API: Upload ảnh để gửi trong tin nhắn
-    Method: POST
-    Form-data: key='file' (file ảnh)
-    """
-    # 1. Kiểm tra xem request có file không
+    # API: Upload ảnh để gửi trong tin nhắn
+
+    # Kiểm tra xem request có file không
     if 'file' not in request.files:
         return jsonify({"message": "Không tìm thấy file trong request"}), 400
         
     file = request.files['file']
     user_id = get_jwt_identity()
     
-    # 2. Gọi Service xử lý logic upload (đã được tách ra service ở bước trước)
+    # Gọi Service xử lý logic upload 
     data, error, status = service.upload_chat_file(file, user_id)
     
     if error:
@@ -62,9 +59,8 @@ def upload_chat_image():
 @chat_bp.route('/groups', methods=['GET'])
 @jwt_required()
 def get_groups():
-    """
-    API: Lấy danh sách nhóm chat của tôi
-    """
+    # API: Lấy danh sách nhóm chat của tôi
+
     current_user_id = get_jwt_identity()
     response, code = service.get_user_groups(current_user_id)
     return jsonify(response), code
@@ -72,51 +68,42 @@ def get_groups():
 @chat_bp.route('/group', methods=['POST'])
 @jwt_required()
 def create_group():
-    """
-    API: Tạo nhóm chat
-    Body: { "name": "Team Dev", "members": [2, 3, 5] }
-    """
+    # API: Tạo nhóm chat
+    # Body: { "name": "Team Dev", "members": [2, 3, 5] }
+
     current_user_id = get_jwt_identity()
     json_data = request.get_json()
     
     group_name = json_data.get('name')
-    member_ids = json_data.get('members', []) # List các ID
+    member_ids = json_data.get('members', [])
     
     response, code = service.create_group_chat(int(current_user_id), group_name, member_ids)
     return jsonify(response), code
 
-@chat_bp.route('/group/<int:group_id>', methods=['DELETE'])
-@jwt_required()
-def delete_group(group_id):
-    """
-    API: Xóa nhóm chat
-    """
-    current_user_id = get_jwt_identity()
-    response, code = service.delete_group_chat(current_user_id, group_id)
-    
-    if code == 200:
-        # Báo cho tất cả thành viên trong phòng biết nhóm đã bị xóa
-        socketio.emit('group_deleted', {'group_id': group_id}, to=str(group_id))
-        
-    return jsonify(response), code
-
-
 @chat_bp.route('/group/<int:group_id>/leave', methods=['POST'])
 @jwt_required()
 def leave_group(group_id):
-    """
-    API: Rời khỏi nhóm chat
-    """
-    current_user_id = get_jwt_identity()
-    response, code = service.leave_group_chat(current_user_id, group_id)
+    # Ép kiểu int()
+    current_user_id = int(get_jwt_identity()) 
     
+    response, code = service.leave_group_chat(current_user_id, group_id)
     if code == 200:
-        # Báo cho những người còn lại trong phòng biết
         socketio.emit('new_message', {
             'content': f"Một thành viên đã rời nhóm.",
             'sender': {'username': 'Hệ thống', 'id': 0, 'avatar': None},
             'timestamp': 'now',
             'room_id': group_id
         }, to=str(group_id))
-        
+    return jsonify(response), code
+
+# ROUTE XÓA NHÓM 
+@chat_bp.route('/group/<int:group_id>', methods=['DELETE'])
+@jwt_required()
+def delete_group(group_id):
+    # Ép kiểu int() để so sánh đúng với admin_id trong DB
+    current_user_id = int(get_jwt_identity()) 
+    
+    response, code = service.delete_group_chat(current_user_id, group_id)
+    if code == 200:
+        socketio.emit('group_deleted', {'group_id': group_id}, to=str(group_id))
     return jsonify(response), code

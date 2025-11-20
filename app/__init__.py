@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_socketio import SocketIO
@@ -60,8 +60,6 @@ def create_app(config_name = 'dev'):
     @app.route('/health')
     def health_check():
         return "App is running"
-    @app.route('/')
-    def index():
-        return render_template('index.html')
+    
 
     return app

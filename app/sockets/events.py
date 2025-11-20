@@ -1,17 +1,15 @@
-# app/sockets/events.py
-
 from flask import request
 from flask_socketio import emit, join_room, leave_room, disconnect
 from flask_jwt_extended import decode_token
 from app import socketio
 from app.api.chat import service as chat_service
 
-# --- BỘ NHỚ TẠM ---
-# Lưu ý: online_users lưu user_id (int)
+# BỘ NHỚ TẠM
+# online_users lưu user_id (int)
 online_users = set()       
 sid_to_user = {}           
 
-# --- Helper: Xác thực Token ---
+# Xác thực Token 
 def get_user_from_token():
     try:
         token = request.args.get('token') 
@@ -30,7 +28,7 @@ def get_user_from_token():
         print(f"Socket Auth Error: {e}")
         return None
 
-# --- 1. CONNECT ---
+# CONNECT 
 @socketio.on('connect')
 def handle_connect():
     user_id = get_user_from_token()
@@ -48,22 +46,22 @@ def handle_connect():
     # Join phòng riêng
     join_room(str(user_id))
     
-    print(f"✅ User {user_id} đã kết nối (SID: {request.sid})")
+    print(f" User {user_id} đã kết nối (SID: {request.sid})")
 
-    # QUAN TRỌNG 1: Báo cho cả thế giới biết mình Online
+    # Báo cho cả thế giới biết mình Online
     emit('user_status', {'user_id': user_id, 'status': 'online'}, broadcast=True)
     
-    # QUAN TRỌNG 2: Gửi danh sách những người ĐANG online cho chính mình
+    # Gửi danh sách những người ĐANG online cho chính mình
     # Để mình biết ai đang sáng đèn
     emit('online_list', list(online_users))
 
-# --- 2. DISCONNECT ---
+# DISCONNECT
 @socketio.on('disconnect')
 def handle_disconnect():
     user_id = sid_to_user.get(request.sid)
     
     if user_id:
-        print(f"❌ User {user_id} đã thoát (SID: {request.sid})")
+        print(f"User {user_id} đã thoát (SID: {request.sid})")
         del sid_to_user[request.sid]
         
         # Kiểm tra xem User còn tab nào khác không
@@ -72,7 +70,7 @@ def handle_disconnect():
             # Báo Offline
             emit('user_status', {'user_id': user_id, 'status': 'offline'}, broadcast=True)
 
-# --- 3. JOIN ROOM (Vào phòng chat) ---
+# JOIN ROOM 
 @socketio.on('join')
 def on_join(data):
     if isinstance(data, str):
@@ -88,7 +86,7 @@ def on_join(data):
         join_room(str(room_id))
         print(f"User {user_id} đã JOIN phòng {room_id}")
 
-# --- 4. SEND MESSAGE ---
+# SEND MESSAGE 
 @socketio.on('send_message')
 def on_send_message(data):
     # Xử lý data
@@ -118,3 +116,34 @@ def on_send_message(data):
 
     # Gửi tin nhắn cho mọi người trong phòng
     emit('new_message', msg_json, to=str(room_id))
+
+@socketio.on('typing')
+def on_typing(data):
+    # Khi Client gửi 'typing', Server chuyển tiếp cho mọi người trong phòng (trừ người gửi)
+
+    if isinstance(data, str):
+        import json
+        try: data = json.loads(data)
+        except: return
+
+    user_id = sid_to_user.get(request.sid)
+    room_id = data.get('room_id')
+    
+    if user_id and room_id:
+        # include_self=False: Không gửi lại cho chính mình
+        emit('typing', {'user_id': user_id, 'room_id': room_id}, to=str(room_id), include_self=False)
+
+@socketio.on('stop_typing')
+def on_stop_typing(data):
+    # Khi Client gửi 'stop_typing'
+
+    if isinstance(data, str):
+        import json
+        try: data = json.loads(data)
+        except: return
+
+    user_id = sid_to_user.get(request.sid)
+    room_id = data.get('room_id')
+    
+    if user_id and room_id:
+        emit('stop_typing', {'user_id': user_id, 'room_id': room_id}, to=str(room_id), include_self=False)

@@ -1,5 +1,6 @@
+from datetime import datetime, timezone
 from app import db
-import datetime
+
 
 class Participant(db.Model):
     __tablename__ = 'participant'    
@@ -7,7 +8,7 @@ class Participant(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     room_id = db.Column(db.Integer, db.ForeignKey('room.id'), nullable=False) 
     # Thời điểm user tham gia phòng
-    joined_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)   
+    joined_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc)) 
     # Quan hệ ngược lại để truy cập dễ dàng
     user = db.relationship(
         'User', 

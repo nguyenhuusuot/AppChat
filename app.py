@@ -1,8 +1,7 @@
 from gevent import monkey
 monkey.patch_all()
 
-
-import os                       # <--- THÊM DÒNG NÀY
+import os     
 from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))

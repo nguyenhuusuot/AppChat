@@ -2,7 +2,7 @@
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import socketio # Import biến socketio instance
+from app import socketio 
 from . import service
 
 users_bp = Blueprint('users', __name__)
@@ -35,12 +35,6 @@ def accept_request(sender_user_id):
     response_data, status_code = service.accept_friend_request(current_user_id, sender_user_id)
     return jsonify(response_data), status_code
 
-@users_bp.route('/friends/<int:target_id>/cancel', methods=['DELETE'])
-@jwt_required()
-def cancel_request(target_id):
-    current_user_id = get_jwt_identity()
-    response, status = service.cancel_friend_request(current_user_id, target_id)
-    return jsonify(response), status
 
 @users_bp.route('/avatar', methods=['POST'])
 @jwt_required()
@@ -55,8 +49,6 @@ def upload_avatar():
     if error: 
         return jsonify({"message": error}), status
     
-    # --- ĐÃ SỬA: XÓA 'broadcast=True' ---
-    # Mặc định socketio.emit từ controller sẽ gửi cho tất cả client
     socketio.emit('user_avatar_update', {
         'user_id': user_id, 
         'avatar': data['avatar_url']
@@ -76,20 +68,33 @@ def search_users():
 @users_bp.route('/profile', methods=['PUT'])
 @jwt_required()
 def update_profile():
-    """
-    API: Cập nhật thông tin cá nhân
-    """
     current_user_id = get_jwt_identity()
     json_data = request.get_json()
     
+    # Gọi service update mới
     data, status = service.update_user_profile(current_user_id, json_data)
     
     if status == 200:
-        # --- ĐÃ SỬA: XÓA 'broadcast=True' ---
+        # Báo cho bạn bè biết mình đổi TÊN HIỂN THỊ
         socketio.emit('user_info_update', {
             'user_id': current_user_id,
             'username': data['username'],
+            'display_name': data['display_name'], 
             'email': data['email']
         })
     
     return jsonify(data), status
+
+@users_bp.route('/friends/<int:target_id>/cancel', methods=['DELETE'])
+@jwt_required()
+def cancel_request(target_id):
+    print(f"\n [CONTROLLER] Nhận yêu cầu DELETE hủy kết bạn với ID: {target_id}")
+    
+    current_user_id = int(get_jwt_identity())
+    print(f" [CONTROLLER] Người yêu cầu: {current_user_id}")
+    
+    # Gọi Service
+    response, status = service.cancel_friend_request(current_user_id, target_id)
+    
+    print(f"[CONTROLLER] Kết quả Service trả về: {status}")
+    return jsonify(response), status
