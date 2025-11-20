@@ -15,9 +15,9 @@ jwt = JWTManager()
 ma = Marshmallow()
 
 # Khởi tạo socketio
-socketio = SocketIO(async_mode='gevent', cors_allowed_origins="*")
+socketio = SocketIO(async_mode='gevent', cors_allowed_origins=[config.ALLOWED_ORIGINS, "http://localhost:5173"])
 
-def create_app(config_name = 'dev'):
+def create_app(config_name = 'prod'):
     # Hàm tạo application 
     # Tạo app 
     app = Flask(__name__)

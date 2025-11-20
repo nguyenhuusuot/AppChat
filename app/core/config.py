@@ -11,8 +11,7 @@ ALLOWED_ORIGINS = [
         "http://localhost:5173",
         "http://127.0.0.1:5500", # (Nếu dùng VS Code Live Server)    
         # Dùng cho khi triển khai (Domain thật)
-        "https://appchat-xcvv.onrender.com",
-        "null"
+        "https://frontend-appchat.onrender.com",    
     ]
 class Config:
     # Cấu hình cơ sở
