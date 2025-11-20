@@ -16,11 +16,6 @@ config_name = get_config_name()
 # Tạo app instance
 app = create_app(config_name)
 
-print("======================================================")
-print(f"[DEBUG] Server đang chạy với Config: {config_name}")
-print(f"[DEBUG] Database URI đang dùng: {app.config['SQLALCHEMY_DATABASE_URI']}")
-print("======================================================")
-
 
 if __name__ == '__main__':
     print(f"Starting server in  '{config_name}' mode..." )
