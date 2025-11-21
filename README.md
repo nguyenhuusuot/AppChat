@@ -15,18 +15,6 @@ AppChat cho phép:
 - WebSockets (Socket.IO hoặc tương đương) để hỗ trợ realtime  
 - Cơ sở dữ liệu PostgreSQL 
 - Thư viện ngoài (xem `requirements.txt`)  
-
-## Cấu trúc thư mục
-/
-├─ app/ # mã nguồn ứng dụng
-├─ migrations/ # các file migration DB
-├─ tests/ # unit tests
-├─ venv/ # môi trường ảo (không nên commit)
-├─ .env # biến môi trường (chứa cấu hình DB, secret...)
-├─ Procfile # cấu hình deploy (Heroku hoặc tương đương)
-├─ requirements.txt # danh sách thư viện Python
-├─ run.py # file khởi chạy ứng dụng
-
 ## Hướng dẫn khởi động
 1. Clone repo:
    git clone https://github.com/nguyenhuusuot/AppChat.git
