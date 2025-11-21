@@ -1,5 +1,5 @@
-Một ứng dụng chat đơn giản được xây dựng bằng Python/Flask cho backend và Reacjs cho frontend — cho phép người dùng trò chuyện theo thời gian thực.
-Deploy Render : https://frontend-appchat.onrender.com/
+# Một ứng dụng chat đơn giản được xây dựng bằng Python/Flask cho backend và Reacjs cho frontend — cho phép người dùng trò chuyện theo thời gian thực.
+# Deploy Render : https://frontend-appchat.onrender.com/
 TK : test1, test2
 MK : Test1@gmail, Test2@gmail
 
@@ -22,26 +22,23 @@ AppChat cho phép:
 Tạo môi trường ảo và kích hoạt:
   python3 -m venv venv
   source venv/bin/activate    # trên Linux/Mac  
-  # hoặc venv\Scripts\activate trên Windows
+  hoặc venv\Scripts\activate trên Windows
   
-Cài các thư viện phụ thuộc:
+# Cài các thư viện phụ thuộc:
 pip install -r requirements.txt
 Thiết lập biến môi trường (ví dụ copy .env.example thành .env và điền thông tin):
 
 SECRET_KEY=your_secret_key
 DATABASE_URL=your_database_url
 Chạy migration (nếu sử dụng):
-flask db upgrade    
-Khởi chạy ứng dụng:
+flask db upgrade
 
+# Khởi chạy ứng dụng:
 python run.py
 Sau đó mở trình duyệt và truy cập http://localhost:5000/ (hoặc port khác tuỳ cấu hình).
 
-Tính năng
- Đăng nhập / Đăng ký người dùng
-
+# Tính năng
+  Đăng nhập / Đăng ký người dùng
   Tham gia phòng chat / tạo nhóm chat mới
-
   Gửi và nhận tin nhắn theo thời gian thực
-
   Giao diện người dùng responsive, gửi hình ảnh/file
